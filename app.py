@@ -23,8 +23,8 @@ SOFTWARE.
 """
 
 import json
+from openai import OpenAI
 import streamlit as st
-from openai import AzureOpenAI
 
 # ==========================================
 # CONFIGURAÇÃO DA PÁGINA DO STREAMLIT
@@ -36,47 +36,24 @@ st.set_page_config(
 )
 
 # ==========================================
-# GUIA DIDÁTICO: CONFIGURAÇÃO DO .streamlit/secrets.toml
-# ==========================================
-"""
-COMO CONFIGURAR O ARQUIVO SECRETS.TOML LOCALMENTE:
-Para manter suas credenciais seguras e fora do código-fonte:
-1. Na raiz do seu projeto Streamlit, crie uma pasta chamada `.streamlit`.
-2. Dentro dessa pasta, crie um arquivo chamado `secrets.toml`.
-3. Cole o seguinte conteúdo estruturado com suas chaves do Azure Foundry:
-
-   [azure_openai]
-   endpoint = "https://marcelomaffeis-05082026-resource.services.ai.azure.com/"
-   api_key = "6t2pTNsmNafDyo53MDAFIrvvQRBZXP7dLcr5j3TLxMS34LQVq3ZUJQQJ99CHACHYHv6XJ3w3AAAAACOGT7os"
-   deployment_name = "gpt-4.1-mini"
-
-O código abaixo verifica automaticamente se o arquivo secrets.toml existe.
-Caso não encontre (ex: execução rápida de testes), ele utiliza os valores padrão fornecidos.
-"""
-
-# ==========================================
-# INICIALIZAÇÃO DO CLIENTE AZURE OPENAI
+# INICIALIZAÇÃO DO CLIENTE OPENAI (COMPATÍVEL COM AZURE AI FOUNDRY)
 # ==========================================
 try:
   AZURE_ENDPOINT = st.secrets["azure_openai"]["endpoint"]
   AZURE_API_KEY = st.secrets["azure_openai"]["api_key"]
   MODEL_NAME = st.secrets["azure_openai"].get("deployment_name", "gpt-4.1-mini")
 except Exception:
-  # Valores padrão fornecidos para fins didáticos/execução imediata
+  # Valores padrão fornecidos para execução imediata
   AZURE_ENDPOINT = (
-      "https://marcelomaffeis-05082026-resource.services.ai.azure.com/"
+      "https://marcelomaffeis-7430-resource.services.ai.azure.com/openai/v1"
   )
   AZURE_API_KEY = (
-      "6t2pTNsmNafDyo53MDAFIrvvQRBZXP7dLcr5j3TLxMS34LQVq3ZUJQQJ99CHACHYHv6XJ3w3AAAAACOGT7os"
+      "1gsyJYiGIr1rIjIm6heIq96VWJI5gMgXeXCaYCHx5WeeWGm3AMYvJQQJ99CJACHYHv6XJ3w3AAAAACOGUF3S"
   )
   MODEL_NAME = "gpt-4.1-mini"
 
-# Instanciação oficial do cliente Azure OpenAI
-client = AzureOpenAI(
-    azure_endpoint=AZURE_ENDPOINT,
-    api_key=AZURE_API_KEY,
-    api_version="2024-02-15-preview",
-)
+# Instanciação corrigida usando o cliente padrão OpenAI com base_url
+client = OpenAI(api_key=AZURE_API_KEY, base_url=AZURE_ENDPOINT)
 
 # ==========================================
 # INTERFACE DO USUÁRIO (UI)
@@ -84,7 +61,7 @@ client = AzureOpenAI(
 st.title("🤖 Extrator de Dados Inteligente")
 st.markdown(
     "Aplicação corporativa integrada à infraestrutura **Microsoft Azure"
-    " OpenAI** para análise estruturada de texto."
+    " OpenAI / AI Foundry** para análise estruturada de texto."
 )
 
 st.divider()
